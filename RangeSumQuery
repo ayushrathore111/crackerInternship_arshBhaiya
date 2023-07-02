@@ -35,3 +35,46 @@ public:
         return sum;
     }
 };
+
+solution 2: segment tree
+vector<int> segmentTree;
+    int n;
+    NumArray(vector<int>& nums) {
+        n=nums.size()-1;
+        segmentTree.resize((n+1)*4,0); 
+        constructSegmentTree(nums,0,n,0);
+    }
+    
+    int sumRange(int left, int right) {
+        return getSumRange(left,right,0,n,0);
+    }
+    int getSumRange(int left,int right,int start,int end,int currentIndex){
+        
+        //no overlapping condition
+        if(end<left || start>right || start>end) return 0;
+
+        //complete overlapping condition
+        if(start >= left && end <= right) return segmentTree[currentIndex];
+
+        //partial overlapping condition
+        int mid=start+(end-start)/2;
+
+        int leftCall=getSumRange(left,right,start,mid,2*currentIndex+1);
+        int rightCall=getSumRange(left,right,mid+1,end,2*currentIndex+2);
+
+        return leftCall+rightCall;
+    }
+    void constructSegmentTree(vector<int>& nums,int start,int end,int currentIndex){
+        if(start>end) return;
+        if(start==end){
+            segmentTree[currentIndex]=nums[start];
+            return;
+        }
+        int mid=start+(end-start)/2;
+        constructSegmentTree(nums,start,mid,2*currentIndex+1);
+        constructSegmentTree(nums,mid+1,end,2*currentIndex+2);
+
+        segmentTree[currentIndex]=segmentTree[2*currentIndex+1]+segmentTree[2*currentIndex+2]; //calculating the sum recursively.
+        return;
+    }
+};
